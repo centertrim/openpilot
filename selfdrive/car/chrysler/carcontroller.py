@@ -208,7 +208,7 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
 
     self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.hybrid_power_meter > 25)
+    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.hybrid_power_meter > 5)
 
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
