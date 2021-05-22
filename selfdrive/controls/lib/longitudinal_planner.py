@@ -25,9 +25,9 @@ _A_CRUISE_MIN_BP = [  0.,  5.,  10., 20.,  40.]
 
 # need fast accel at very low speed for stop and go
 # make sure these accelerations are smaller than mpc limits
-_A_CRUISE_MAX_V = [1.0, 1.0, 0.65, .4]
-_A_CRUISE_MAX_V_FOLLOWING = [1.0, 1.0, 0.65, .4]
-_A_CRUISE_MAX_BP = [0.,  6.4, 22.5, 40.]
+_A_CRUISE_MAX_V = [1.6, 1.2, 1.0, 0.65, .4]
+_A_CRUISE_MAX_V_FOLLOWING = [1.4, 1.2, 1.0, 1.0, 0.65, .4]
+_A_CRUISE_MAX_BP = [0., .8,  6.4, 22.5, 40.]
 
 # Lookup table for turns
 _A_TOTAL_MAX_V = [1.7, 3.2]
@@ -126,7 +126,7 @@ class Planner():
     lead_2 = sm['radarState'].leadTwo
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
-    following = lead_1.status and lead_1.dRel < 85.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
+    following = lead_1.status and lead_1.dRel < 45.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
 
     self.v_acc_start = self.v_acc_next
     self.a_acc_start = self.a_acc_next

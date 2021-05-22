@@ -15,14 +15,14 @@ ACCEL_SCALE = 1.
 
 DEFAULT_DECEL = 4.0 # m/s2
 START_BRAKE_THRESHOLD = -0.25 # m/s2
-STOP_BRAKE_THRESHOLD = 0.001 # m/s2
-START_GAS_THRESHOLD = 0.002 # m/s2
-STOP_GAS_THRESHOLD = 0.0 # m/s2
+STOP_BRAKE_THRESHOLD = 0.02 # m/s2
+START_GAS_THRESHOLD = 0.0 # m/s2
+STOP_GAS_THRESHOLD = -0.249 # m/s2
 
 CHIME_TIME = 8
 CHIME_GAP_TIME = 5
 
-def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, resbut, timer, ressetspeed, short_press, vego, gas_set, gas):
+def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, resbut, timer, ressetspeed, short_press, vego, gas_set, gas, gas_timer):
 
     set_speed = int(round((set_speed * CV.MS_TO_MPH), 0))
     vego = int(round((vego * CV.MS_TO_MPH), 0))
@@ -71,13 +71,17 @@ def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, r
     else:
       short_press = False
       timer = 0
-    if not gas:
+
+    if not gas or gas_timer > 200:
       gas_set = False
+      gas_timer = 0
+    elif gas_set:
+      gas_timer += 1
 
     set_speed = set_speed * CV.MPH_TO_MS
     set_speed = clip(set_speed, SET_SPEED_MIN, SET_SPEED_MAX)
 
-    return set_speed, short_press, timer, gas_set, ressetspeed
+    return set_speed, short_press, timer, gas_set, ressetspeed, gas_timer
 
 
 def cruiseiconlogic(acc_enabled, acc_available, has_lead):
@@ -108,19 +112,18 @@ def accel_hysteresis(accel, accel_steady):
 
   return accel, accel_steady
 
-def accel_rate_limit(accel_lim, prev_accel_lim, freeze_gas):
+def accel_rate_limit(accel_lim, prev_accel_lim):
  # acceleration jerk = 2.0 m/s/s/s
  # brake jerk = 3.8 m/s/s/s
 
   drBp = [0., -0.15, -0.50, -1.0, -1.5, -5.0]
-  dra = [ -0.005, -0.012,  -0.01, -0.015, -0.03, -0.04]
+  dra = [ -0.005, -0.007,  -0.01, -0.015, -0.02, -0.04]
 
   decel_rate = interp(accel_lim, drBp, dra)
-  accel_rate = 0.002 if freeze_gas else 0.02
 
   if accel_lim > 0:
     if accel_lim > prev_accel_lim:
-      accel_lim = min(accel_lim, prev_accel_lim + accel_rate)
+      accel_lim = min(accel_lim, prev_accel_lim + 0.01)
     else:
       accel_lim = max(accel_lim, prev_accel_lim - 0.038)
   else:
