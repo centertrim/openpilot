@@ -53,7 +53,9 @@ class CarController():
     self.gap_timer = 0
     self.enabled_prev = False
     self.resume_set_speed = 0
+    self.allow_resume_button = False
     self.acc_counter = 0
+    self.gas_timer = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -140,7 +142,7 @@ class CarController():
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and not self.op_long_enable:
         button_type = 'ACC_CANCEL'
         self.op_cancel_cmd = True
-      elif enabled and self.resume_press and (CS.lead_dist > self.lead_dist_at_stop or op_lead_rvel > 0 or 15 > CS.lead_dist >= 6.):
+      elif enabled and (self.resume_press or self.op_long_enable) and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
         button_type = 'ACC_RESUME'
       elif long_starting:
         button_type = 'ACC_RESUME'
@@ -178,21 +180,28 @@ class CarController():
     ####################################################################################################################
     if CS.acc_on_button and not CS.acc_on_button_prev:
        self.acc_available = not self.acc_available
+       if not self.acc_available:
+         self.allow_resume_button = False
 
     self.acc_enabled_prev = self.acc_enabled
 
+    set_button = CS.acc_resume_button or CS.acc_setminus_button if not self.allow_resume_button else CS.acc_setminus_button
+    res_button = CS.acc_resume_button if self.allow_resume_button else False
+
     if not self.acc_enabled and not CS.out.brakePressed and self.acc_available and \
-            (CS.acc_setplus_button or CS.acc_setminus_button or CS.acc_resume_button):
+            (CS.acc_setplus_button or set_button or res_button):
       self.acc_enabled = True
+      if not self.allow_resume_button:
+        self.allow_resume_button = True
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
 
 
     self.set_speed, self.short_press, self.set_speed_timer, \
-    self.gas_speed_sync, self.resume_set_speed = setspeedlogic(self.set_speed, self.acc_enabled, self.acc_enabled_prev,
-                                                               CS.acc_setplus_button, CS.acc_setminus_button, CS.acc_resume_button,
+    self.gas_speed_sync, self.resume_set_speed, self.gas_timer = setspeedlogic(self.set_speed, self.acc_enabled, self.acc_enabled_prev,
+                                                               CS.acc_setplus_button, set_button, res_button,
                                                                self.set_speed_timer, self.resume_set_speed, self.short_press,
-                                                               CS.out.vEgoRaw, self.gas_speed_sync, CS.out.gasPressed)
+                                                               CS.out.vEgoRaw, self.gas_speed_sync, CS.out.gasPressed, self.gas_timer)
 
     self.cruise_state, self.cruise_icon = cruiseiconlogic(self.acc_enabled, self.acc_available, op_lead_visible)
 
@@ -208,7 +217,7 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
 
     self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.hybrid_power_meter > 5)
+    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
@@ -223,7 +232,12 @@ class CarController():
     self.go_req = long_starting
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
-      self.trq_val = apply_accel * CV.ACCEL_TO_NM
+
+      if CS.hybrid_power_meter > 25 and self.trq_val > CS.axle_torq:
+        self.trq_val = CS.axle_torq - 100
+      else:
+        self.trq_val = apply_accel * CV.ACCEL_TO_NM
+
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
         self.accel_active = True
         self.stop_req = False

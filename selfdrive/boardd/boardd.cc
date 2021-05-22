@@ -1,36 +1,33 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sched.h>
 #include <errno.h>
+#include <sched.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/cdefs.h>
-#include <sys/types.h>
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include <ctime>
-#include <cassert>
-#include <iostream>
 #include <algorithm>
-#include <bitset>
-#include <thread>
 #include <atomic>
+#include <bitset>
+#include <cassert>
+#include <thread>
 #include <unordered_map>
 
 #include <libusb-1.0/libusb.h>
 
 #include "cereal/gen/cpp/car.capnp.h"
-
-#include "common/util.h"
-#include "common/params.h"
-#include "common/swaglog.h"
-#include "common/timing.h"
-#include "messaging.h"
-#include "locationd/ublox_msg.h"
+#include "cereal/messaging/messaging.h"
+#include "selfdrive/common/params.h"
+#include "selfdrive/common/swaglog.h"
+#include "selfdrive/common/timing.h"
+#include "selfdrive/common/util.h"
 #include "selfdrive/hardware/hw.h"
+#include "selfdrive/locationd/ublox_msg.h"
 
-#include "panda.h"
-#include "pigeon.h"
+#include "selfdrive/boardd/panda.h"
+#include "selfdrive/boardd/pigeon.h"
 
 #define MAX_IR_POWER 0.5f
 #define MIN_IR_POWER 0.0f
@@ -43,21 +40,7 @@ std::atomic<bool> safety_setter_thread_running(false);
 std::atomic<bool> ignition(false);
 
 ExitHandler do_exit;
-struct tm get_time(){
-  time_t rawtime;
-  time(&rawtime);
 
-  struct tm sys_time;
-  gmtime_r(&rawtime, &sys_time);
-
-  return sys_time;
-}
-
-bool time_valid(struct tm sys_time){
-  int year = 1900 + sys_time.tm_year;
-  int month = 1 + sys_time.tm_mon;
-  return (year > 2020) || (year == 2020 && month >= 10);
-}
 
 void safety_setter_thread() {
   LOGD("Starting safety setter thread");
@@ -165,10 +148,10 @@ bool usb_connect() {
 
   if (tmp_panda->has_rtc){
     setenv("TZ","UTC",1);
-    struct tm sys_time = get_time();
+    struct tm sys_time = util::get_time();
     struct tm rtc_time = tmp_panda->get_rtc();
 
-    if (!time_valid(sys_time) && time_valid(rtc_time)) {
+    if (!util::time_valid(sys_time) && util::time_valid(rtc_time)) {
       LOGE("System time wrong, setting from RTC. "
            "System: %d-%02d-%02d %02d:%02d:%02d RTC: %d-%02d-%02d %02d:%02d:%02d",
            sys_time.tm_year + 1900, sys_time.tm_mon + 1, sys_time.tm_mday,
@@ -335,9 +318,9 @@ void panda_state_thread(bool spoofing_started) {
     if ((panda->has_rtc) && !ignition && (no_ignition_cnt % 120 == 1)){
       // Write time to RTC if it looks reasonable
       setenv("TZ","UTC",1);
-      struct tm sys_time = get_time();
+      struct tm sys_time = util::get_time();
 
-      if (time_valid(sys_time)){
+      if (util::time_valid(sys_time)){
         struct tm rtc_time = panda->get_rtc();
         double seconds = difftime(mktime(&rtc_time), mktime(&sys_time));
 
@@ -359,7 +342,10 @@ void panda_state_thread(bool spoofing_started) {
 
     // build msg
     MessageBuilder msg;
-    auto ps = msg.initEvent().initPandaState();
+    auto evt = msg.initEvent();
+    evt.setValid(panda->comms_healthy);
+
+    auto ps = evt.initPandaState();
     ps.setUptime(pandaState.uptime);
 
     if (Hardware::TICI()) {
@@ -544,6 +530,7 @@ void pigeon_thread() {
     } else if (!ignition && ignition_last) {
       // power off on falling edge of ignition
       LOGD("powering off pigeon\n");
+      pigeon->stop();
       pigeon->set_power(false);
     }
 
