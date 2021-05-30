@@ -8,16 +8,16 @@ LONG_PRESS_TIME = 50  # 500msec
 SHORT_PRESS_STEP = 1
 LONG_PRESS_STEP = 5
 # Accel Hard limits
-ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
+ACCEL_HYST_GAP = 0.0  # don't change accel command for small oscillations within this value
 ACCEL_MAX = 2.  # m/s2
 ACCEL_MIN = -3.8  # m/s2
 ACCEL_SCALE = 1.
 
 DEFAULT_DECEL = 4.0 # m/s2
 START_BRAKE_THRESHOLD = -0.25 # m/s2
-STOP_BRAKE_THRESHOLD = 0.02 # m/s2
+STOP_BRAKE_THRESHOLD = 0.0 # m/s2
 START_GAS_THRESHOLD = 0.0 # m/s2
-STOP_GAS_THRESHOLD = -0.249 # m/s2
+STOP_GAS_THRESHOLD = -0.25 # m/s2
 
 CHIME_TIME = 8
 CHIME_GAP_TIME = 5
@@ -116,8 +116,8 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
  # acceleration jerk = 2.0 m/s/s/s
  # brake jerk = 3.8 m/s/s/s
 
-  drBp = [0., -0.15, -0.50, -1.0, -1.5, -5.0]
-  dra = [ -0.005, -0.007,  -0.01, -0.015, -0.02, -0.04]
+  drBp = [   0., -0.15, -0.50,  -1.0, -1.5, -5.0]
+  dra = [ 0.005, 0.007,  0.01, 0.015, 0.02, 0.04]
 
   decel_rate = interp(accel_lim, drBp, dra)
 
@@ -132,7 +132,7 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
     else:
       accel_lim = min(accel_lim, prev_accel_lim + 0.01)
 
-  return accel_lim
+  return accel_lim, decel_rate
 
 
 def cluster_chime(chime_val, enabled, enabled_prev, chime_timer, gap_timer):

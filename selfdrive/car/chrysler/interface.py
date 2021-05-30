@@ -27,7 +27,7 @@ class CarInterface(CarInterfaceBase):
 
     # Long tuning Params -  make individual params for cars, baseline Pacifica Hybrid
     ret.longitudinalTuning.kpBP = [0., .3, 10., 35.]
-    ret.longitudinalTuning.kpV = [1.8, 1.2, .8, .3]
+    ret.longitudinalTuning.kpV = [1.8, 1.2, .8, .6]
     ret.longitudinalTuning.kiBP = [0., .3, 15., 35.]
     ret.longitudinalTuning.kiV = [0.15, .10, .05, .045]
     ret.longitudinalTuning.deadzoneBP = [0., .5]
@@ -130,7 +130,7 @@ class CarInterface(CarInterfaceBase):
 
     can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel,
                                c.hudControl.visualAlert,
-                               c.hudControl.leadRelvel,
+                               c.hudControl.leadvRel,
                                c.hudControl.leadVisible, c.hudControl.leadDistance, 
                                c.hudControl.longStarting)
 

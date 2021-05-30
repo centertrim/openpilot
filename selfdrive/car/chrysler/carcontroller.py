@@ -1,3 +1,5 @@
+from numpy import interp
+
 from common.op_params import opParams
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
@@ -56,6 +58,9 @@ class CarController():
     self.allow_resume_button = False
     self.acc_counter = 0
     self.gas_timer = 0
+    self.go_req = 0
+    self.pre_decel_val = 0.
+    self.pos_aego_latch = False
 
     self.packer = CANPacker(dbc_name)
 
@@ -142,9 +147,9 @@ class CarController():
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and not self.op_long_enable:
         button_type = 'ACC_CANCEL'
         self.op_cancel_cmd = True
-      elif enabled and (self.resume_press or self.op_long_enable) and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
+      elif enabled and self.resume_press and not self.op_long_enable and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
         button_type = 'ACC_RESUME'
-      elif long_starting:
+      elif self.go_req or long_starting:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
@@ -190,6 +195,7 @@ class CarController():
 
     if not self.acc_enabled and not CS.out.brakePressed and self.acc_available and \
             (CS.acc_setplus_button or set_button or res_button):
+      
       self.acc_enabled = True
       if not self.allow_resume_button:
         self.allow_resume_button = True
@@ -207,36 +213,53 @@ class CarController():
 
     # Build ACC long control signals
     ####################################################################################################################
-    self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed
-
     # gas and brake
     self.accel_lim_prev = self.accel_lim
-    apply_accel = actuators.gas - actuators.brake
+    apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
-    apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
-    apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
-
-    self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
+    accmaxBp = [20, 25, 40]
+    accmaxhyb = [ACCEL_MAX, 1., .5]
 
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
+    if not self.go_req:
+      self.go_req = long_starting
+    else:
+      self.go_req = CS.out.standstill
+    self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed and not self.go_req
+    if self.go_req or self.stop_req:
+      accmaxhyb = [.75, .75, .75]
+
+    apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
+    accel_max_tbl = interp(CS.hybrid_power_meter, accmaxBp, accmaxhyb)
+
+    apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, accel_max_tbl)
+
+    self.accel_lim = apply_accel
+    apply_accel, decel_rate = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     if not CS.out.accgasOverride and\
-            (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):
+            ((apply_accel <= START_BRAKE_THRESHOLD)
+             or (self.decel_active and (apply_accel < STOP_BRAKE_THRESHOLD or apply_accel < CS.out.aEgo))
+             or self.stop_req):
       self.decel_active = True
-      self.decel_val = apply_accel
+      if self.pre_decel_val > 0. or self.pos_aego_latch and self.pre_decel_val > apply_accel:  # going down slope causes jerky braking, start from aego and ramp down
+        self.pre_decel_val = max(self.pre_decel_val - decel_rate, apply_accel)
+        self.decel_val = self.pre_decel_val
+        self.pos_aego_latch = True
+      else:
+        self.decel_val = apply_accel
+        self.pre_decel_val = 0.
+        self.pos_aego_latch = False
     else:
       self.decel_active = False
-      
-    self.go_req = long_starting
+      self.pre_decel_val = CS.out.aEgo
+      self.pos_aego_latch = False
 
-    if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
-
-      if CS.hybrid_power_meter > 25 and self.trq_val > CS.axle_torq:
-        self.trq_val = CS.axle_torq - 100
-      else:
-        self.trq_val = apply_accel * CV.ACCEL_TO_NM
+    if not self.decel_active and not CS.out.brakePressed and\
+            ((apply_accel >= START_GAS_THRESHOLD)
+             or (self.accel_active and apply_accel > STOP_GAS_THRESHOLD)):
+      self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
         self.accel_active = True

@@ -104,8 +104,11 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     dashcamMode @96;
     controlsInitializing @98;
     usbError @99;
-    cameraError @100;
-    hightorqsteerUnavailable @ 101;
+    roadCameraError @100;
+    driverCameraError @101;
+    wideRoadCameraError @102;
+
+    hightorqsteerUnavailable @ 103;
 
     radarCanErrorDEPRECATED @15;
     radarCommIssueDEPRECATED @67;
@@ -324,7 +327,7 @@ struct CarControl {
     leadDistance @10: Float32;
     longStopping @11: Bool;
     longStarting @12: Bool;
-    leadRelvel @13: Float32;
+    leadvRel @13: Float32;
 
     enum VisualAlert {
       # these are the choices from the Honda

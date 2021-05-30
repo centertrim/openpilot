@@ -23,6 +23,7 @@ struct Map(Key, Value) {
 struct InitData {
   kernelArgs @0 :List(Text);
   kernelVersion @15 :Text;
+  osVersion @18 :Text;
 
   gctx @1 :Text;
   dongleId @2 :Text;
@@ -337,6 +338,7 @@ struct DeviceState @0xa4d8b5af2aa492eb {
     band @2 :Text;
     channel @3 :UInt16;
     extra @4 :Text;
+    state @5 :Text;
   }
 
   # deprecated
@@ -1276,6 +1278,7 @@ struct Sentinel {
     startOfRoute @3;
   }
   type @0 :SentinelType;
+  signal @1 :Int32;
 }
 
 struct ManagerState {
