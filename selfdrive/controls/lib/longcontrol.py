@@ -9,7 +9,7 @@ STOPPING_TARGET_SPEED_OFFSET = 0.01
 STARTING_TARGET_SPEED = 0.5
 BRAKE_THRESHOLD_TO_PID = 0.2
 
-BRAKE_STOPPING_TARGET = 0.5  # apply at least this amount of brake to maintain the vehicle stationary
+BRAKE_STOPPING_TARGET = 2.0  # apply at least this amount of brake to maintain the vehicle stationary
 
 RATE = 100.0
 
@@ -55,7 +55,7 @@ class LongControl():
     self.long_control_state = LongCtrlState.off  # initialized to off
 
     kdBP = [0., 16., 35.]
-    kdV = [0.08, 0.015, 0.051]
+    kdV = [0.008, 0.015, 0.051]
 
     self.pid = PIDLongController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                             (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
@@ -117,7 +117,7 @@ class LongControl():
 
     # Intention is to move again, release brake fast before handing control to PID
     elif self.long_control_state == LongCtrlState.starting:
-      if output_gb < 0.4:
+      if output_gb < -0.2:
         output_gb += CP.startingBrakeRate / RATE
       self.reset(CS.vEgo)
 
