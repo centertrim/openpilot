@@ -145,7 +145,8 @@ class Controls:
     # TODO: no longer necessary, aside from process replay
     self.sm['liveParameters'].valid = True
 
-    self.startup_event = get_startup_event(car_recognized, controller_available, self.CP.fuzzyFingerprint)
+    self.startup_event = get_startup_event(car_recognized, controller_available, self.CP.fuzzyFingerprint,
+                                           len(self.CP.carFw) > 0)
 
     if not sounds_available:
       self.events.add(EventName.soundsUnavailable, static=True)
@@ -186,7 +187,8 @@ class Controls:
     if self.sm['deviceState'].freeSpacePercent < 7:
       # under 7% of space free no enable allowed
       self.events.add(EventName.outOfSpace)
-    if self.sm['deviceState'].memoryUsagePercent > 65:
+    # TODO: make tici threshold the same
+    if self.sm['deviceState'].memoryUsagePercent > (90 if TICI else 65):
       self.events.add(EventName.lowMemory)
 
     # Alert if fan isn't spinning for 5 seconds
@@ -271,7 +273,7 @@ class Controls:
             continue
 
           csid = m.split("CSID:")[-1].split(" ")[0]
-          evt = {"0": EventName.wideRoadCameraError, "1": EventName.roadCameraError,
+          evt = {"0": EventName.roadCameraError, "1": EventName.wideRoadCameraError,
                  "2": EventName.driverCameraError}.get(csid, None)
           if evt is not None:
             self.events.add(evt)
@@ -282,6 +284,8 @@ class Controls:
         self.events.add(EventName.cameraMalfunction)
       if self.sm['modelV2'].frameDropPerc > 20:
         self.events.add(EventName.modeldLagging)
+      if self.sm['liveLocationKalman'].excessiveResets:
+        self.events.add(EventName.localizerMalfunction)
 
       # Check if all manager processes are running
       not_running = set(p.name for p in self.sm['managerState'].processes if not p.running)

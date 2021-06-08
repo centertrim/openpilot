@@ -21,12 +21,13 @@ AWARENESS_DECEL = -0.2     # car smoothly decel at .2m/s^2 when user is distract
 # lookup tables VS speed to determine min and max accels in cruise
 # make sure these accelerations are smaller than mpc limits
 _A_CRUISE_MIN_V = [-1.0, -.8, -.67, -.5, -.30]
+_A_CRUISE_MIN_V_FOLLOWING = [-.005, -.005, -.005, -.005, -.005]
 _A_CRUISE_MIN_BP = [  0.,  5.,  10., 20.,  40.]
 
 # need fast accel at very low speed for stop and go
 # make sure these accelerations are smaller than mpc limits
-_A_CRUISE_MAX_V = [1.6, 1.2, 1.0, 0.65, .4]
-_A_CRUISE_MAX_V_FOLLOWING = [1.4, 1.2, 1.0, 1.0, 0.65, .4]
+_A_CRUISE_MAX_V = [1.0, 1.0, 1.0, 0.65, .4]
+_A_CRUISE_MAX_V_FOLLOWING = [1.0, 1.0, 1.0, 1.0, 0.65, .4]
 _A_CRUISE_MAX_BP = [0., .8,  6.4, 22.5, 40.]
 
 # Lookup table for turns
@@ -35,12 +36,13 @@ _A_TOTAL_MAX_BP = [20., 40.]
 
 
 def calc_cruise_accel_limits(v_ego, following):
-  a_cruise_min = interp(v_ego, _A_CRUISE_MIN_BP, _A_CRUISE_MIN_V)
 
   if following:
     a_cruise_max = interp(v_ego, _A_CRUISE_MAX_BP, _A_CRUISE_MAX_V_FOLLOWING)
+    a_cruise_min = interp(v_ego, _A_CRUISE_MIN_BP, _A_CRUISE_MIN_V)
   else:
     a_cruise_max = interp(v_ego, _A_CRUISE_MAX_BP, _A_CRUISE_MAX_V)
+    a_cruise_min = interp(v_ego, _A_CRUISE_MIN_BP, _A_CRUISE_MIN_V)
   return np.vstack([a_cruise_min, a_cruise_max])
 
 
@@ -122,6 +124,14 @@ class Planner():
     v_cruise_kph = min(v_cruise_kph, V_CRUISE_MAX)
     v_cruise_setpoint = v_cruise_kph * CV.KPH_TO_MS
 
+    if self.op_params.get('slow_in_turns'):
+      curvs = list(lateral_planner.mpc_solution.curvature)
+      if len(curvs):
+        # find the largest curvature in the solution and use that.
+        curv = max(abs(min(curvs)), abs(max(curvs)))
+        if curv != 0:
+          v_cruise_setpoint = float(min(v_cruise_setpoint, self.limit_speed_in_curv(sm, curv)))
+
     lead_1 = sm['radarState'].leadOne
     lead_2 = sm['radarState'].leadTwo
 
@@ -190,13 +200,6 @@ class Planner():
     self.v_acc_next = v_acc_sol
     self.a_acc_next = a_acc_sol
 
-    if self.op_params.get('slow_in_turns'):
-      curvs = list(lateral_planner.mpc_solution.curvature)
-      if len(curvs):
-        # find the largest curvature in the solution and use that.
-        curv = max(abs(min(curvs)), abs(max(curvs)))
-        self.v_acc_future = float(min(self.v_acc_future, self.limit_speed_in_curv(sm, curv)))
-
     self.first_loop = False
 
   def publish(self, sm, pm):
@@ -230,19 +233,9 @@ class Planner():
     v_ego = sm['carState'].vEgo
     a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
 
-    # rotate the line
-    angle = self.op_params.get('slow_in_turns_rotate')
-    if angle != 0:
-      _, a_y_max = self.rotate((0, 2.975), (v_ego, a_y_max), angle * 0.0174533)
+    if a_y_max > 0:
+      a_y_max = np.sqrt(a_y_max) ** a_y_max
 
     v_curvature = np.sqrt(a_y_max / np.clip(curv, 1e-4, None))
     model_speed = np.min(v_curvature)
     return model_speed * self.op_params.get('slow_in_turns_ratio')
-
-  def rotate(self, origin, point, angle):
-    ox, oy = origin
-    px, py = point
-
-    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
-    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
-    return qx, qy
