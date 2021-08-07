@@ -24,6 +24,7 @@ from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.controls.lib.longitudinal_planner import LON_MPC_STEP
 from selfdrive.locationd.calibrationd import Calibration
 from selfdrive.hardware import HARDWARE, TICI
+from common.op_params import opParams
 
 LDW_MIN_SPEED = 31 * CV.MPH_TO_MS
 LANE_DEPARTURE_THRESHOLD = 0.1
@@ -46,6 +47,8 @@ long_ctrl_state = log.ControlsState.LongControlState
 class Controls:
   def __init__(self, sm=None, pm=None, can_sock=None):
     config_realtime_process(4 if TICI else 3, Priority.CTRL_HIGH)
+
+    self.op_params = opParams()  # always init opParams first
 
     # Setup sockets
     self.pm = pm
@@ -415,7 +418,8 @@ class Controls:
     # Update VehicleModel
     params = self.sm['liveParameters']
     x = max(params.stiffnessFactor, 0.1)
-    sr = max(params.steerRatio, 0.1)
+    #sr = max(params.steerRatio, 0.1)   # learned value
+    sr = max(self.op_params.get('steerRatio'), 0.1)
     self.VM.update_params(x, sr)
 
     lat_plan = self.sm['lateralPlan']

@@ -66,7 +66,8 @@ class opParams:
                         'slow_in_turns_ratio': Param(1.25, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
                         'nonudgeLCA': Param(False, bool, 'Toggle to enable no nudge lane change'),
                         'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
-                        'not_visible_to_dm_cam': Param(False, bool, 'Toggle on if you are not visible to dm cam due to placement')
+                        'not_visible_to_dm_cam': Param(False, bool, 'Toggle on if you are not visible to dm cam due to placement'),
+                        'steerRatio': Param(16.2, VT.number, 'Steer Ratio (fixed - no learning)', live=True),
                         }
 
 
