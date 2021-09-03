@@ -24,6 +24,7 @@ from selfdrive.controls.lib.alertmanager import AlertManager
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.locationd.calibrationd import Calibration
 from selfdrive.hardware import HARDWARE, TICI, EON
+from common.op_params import opParams
 from selfdrive.manager.process_config import managed_processes
 
 LDW_MIN_SPEED = 31 * CV.MPH_TO_MS
@@ -51,6 +52,8 @@ long_ctrl_state = log.ControlsState.LongControlState
 class Controls:
   def __init__(self, sm=None, pm=None, can_sock=None):
     config_realtime_process(4 if TICI else 3, Priority.CTRL_HIGH)
+    
+    self.op_params = opParams()  # always init opParams first
 
     # Setup sockets
     self.pm = pm
@@ -441,7 +444,7 @@ class Controls:
     # Update VehicleModel
     params = self.sm['liveParameters']
     x = max(params.stiffnessFactor, 0.1)
-    sr = max(params.steerRatio, 0.1)
+    sr = max(self.op_params.get('steerRatio'), 8.0)
     self.VM.update_params(x, sr)
 
     lat_plan = self.sm['lateralPlan']
