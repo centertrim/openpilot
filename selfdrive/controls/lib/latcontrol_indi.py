@@ -8,10 +8,12 @@ from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.toyota.values import CarControllerParams
 from selfdrive.controls.lib.drive_helpers import get_steer_max
-
+from common.op_params import opParams
 
 class LatControlINDI():
   def __init__(self, CP):
+    self.op_params = opParams()
+    
     self.angle_steers_des = 0.
 
     A = np.array([[1.0, DT_CTRL, 0.0],
@@ -50,18 +52,22 @@ class LatControlINDI():
 
   @property
   def RC(self):
+    return self.op_params.get('indi_time_constant')
     return interp(self.speed, self._RC[0], self._RC[1])
 
   @property
   def G(self):
+    return self.op_params.get('indi_actuator_effectiveness')
     return interp(self.speed, self._G[0], self._G[1])
 
   @property
   def outer_loop_gain(self):
+    return self.op_params.get('indi_outer_loop')
     return interp(self.speed, self._outer_loop_gain[0], self._outer_loop_gain[1])
 
   @property
   def inner_loop_gain(self):
+    return self.op_params.get('indi_inner_loop')
     return interp(self.speed, self._inner_loop_gain[0], self._inner_loop_gain[1])
 
   def reset(self):

@@ -62,6 +62,11 @@ class opParams:
 
     VT = ValueTypes()
     self.fork_params = {
+                        'indi_inner_loop': Param(4.0, VT.number, 'Somewhat affects response to rate - overcorrection', live=True),
+                        'indi_outer_loop': Param(3.75, VT.number, 'Turn aggressiveness', live=True),
+                        'indi_time_constant': Param(1.25, VT.number, 'In seconds, takes the exponential moving average of the output (smooths it)', live=True),
+                        'indi_actuator_effectiveness': Param(5.0, VT.number, 'Higher values give less torque, lower more torque\n'
+                                                                          'The inverse of this is multiplied against accel_error and added onto the current output to be smoothed', live=True),
                         'slow_in_turns': Param(False, bool, 'Slow while in turns'),
                         'slow_in_turns_ratio': Param(1.25, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
                         'nonudgeLCA': Param(False, bool, 'Toggle to enable no nudge lane change'),
