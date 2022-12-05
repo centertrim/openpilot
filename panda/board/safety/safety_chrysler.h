@@ -122,6 +122,8 @@ static int chrysler_rx_hook(CANPacket_t *to_push) {
   return valid;
 }
 
+uint32_t ts_last = 0;
+
 static int chrysler_tx_hook(CANPacket_t *to_send) {
 
   int tx = 1;
