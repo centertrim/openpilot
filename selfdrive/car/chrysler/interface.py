@@ -25,14 +25,13 @@ class CarInterface(CarInterfaceBase):
 
     ret.minSteerSpeed = 3.8  # m/s
 
-	ret.lateralTuning.pid.kpBP = [0., 10., 35.]
+    ret.lateralTuning.pid.kpBP = [0., 10., 35.]
     ret.lateralTuning.pid.kpV = [0.07, 0.07, 0.07]
 
     ret.lateralTuning.pid.kiBP = [0., 15., 30.]
     ret.lateralTuning.pid.kiV = [0.005, 0.005, 0.003]
 
     ret.lateralTuning.pid.kf = 0.00005   # full torque for 10 deg at 80mph means 0.00007818594
-
 
     ret.experimentalLongitudinalAvailable = Params().get_bool('ChryslerMangoLong')
     ret.openpilotLongitudinalControl = Params().get_bool('ChryslerMangoLong')
