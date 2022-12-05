@@ -427,7 +427,8 @@ struct CarParams {
   enableDsu @5 :Bool;        # driving support unit
   enableBsm @56 :Bool;       # blind spot monitoring
   flags @64 :UInt32;         # flags for car specific quirks
-  enablehybridEcu @71 :Bool; #hydrid ecu
+  experimentalLongitudinalAvailable @71 :Bool;
+  enablehybridEcu @72 :Bool; #hydrid ecu
 
   minEnableSpeed @7 :Float32;
   minSteerSpeed @8 :Float32;
