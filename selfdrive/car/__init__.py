@@ -1,6 +1,7 @@
 # functions common among cars
 import capnp
 
+from common.params import Params
 from cereal import car
 from common.numpy_fast import clip
 from typing import Dict
@@ -97,6 +98,22 @@ def apply_toyota_steer_torque_limits(apply_torque, apply_torque_last, motor_torq
   min_lim = max(min(motor_torque - LIMITS.STEER_ERROR_MAX, -LIMITS.STEER_ERROR_MAX), -LIMITS.STEER_MAX)
 
   apply_torque = clip(apply_torque, min_lim, max_lim)
+
+  if Params().get_bool('ChryslerMangoLat'):
+    if abs(apply_torque) < 20:
+      LIMITS.STEER_DELTA_UP = 2.
+    elif abs(apply_torque) < 40:
+      LIMITS.STEER_DELTA_UP = 1.7
+    elif abs(apply_torque) < 50:
+      LIMITS.STEER_DELTA_UP = 1.5
+    elif abs(apply_torque) < 270:
+      LIMITS.STEER_DELTA_UP = 1.4
+    elif abs(apply_torque) < 350:
+      LIMITS.STEER_DELTA_UP = 1.4
+  else:
+    LIMITS.STEER_DELTA_UP = 2.2
+
+  LIMITS.STEER_DELTA_DOWN = LIMITS.STEER_DELTA_UP
 
   # slow rate if steer torque increases in magnitude
   if apply_torque_last > 0:

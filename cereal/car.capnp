@@ -114,6 +114,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     canBusMissing @111;
     controlsdLagging @112;
     resumeBlocked @113;
+    hightorqsteerUnavailable @ 116;
 
     radarCanErrorDEPRECATED @15;
     communityFeatureDisallowedDEPRECATED @62;
@@ -172,6 +173,8 @@ struct CarState {
   parkingBrake @39 :Bool;
   brakeHoldActive @38 :Bool;
 
+  brakeLights @19 :Bool;
+
   # steering wheel
   steeringAngleDeg @7 :Float32;
   steeringAngleOffsetDeg @37 :Float32; # Offset betweens sensors in case there multiple
@@ -184,6 +187,8 @@ struct CarState {
   stockAeb @30 :Bool;
   stockFcw @31 :Bool;
   espDisabled @32 :Bool;
+  hightorqUnavailable @46 :Bool;
+  accgasOverride @47 :Bool;
   accFaulted @42 :Bool;
 
   # cruise state
@@ -268,7 +273,6 @@ struct CarState {
   }
 
   errorsDEPRECATED @0 :List(CarEvent.EventName);
-  brakeLightsDEPRECATED @19 :Bool;
   steeringRateLimitedDEPRECATED @29 :Bool;
 }
 
@@ -344,7 +348,8 @@ struct CarControl {
       off @0;
       pid @1;
       stopping @2;
-      starting @3;
+
+      startingDEPRECATED @3;
     }
 
   }
@@ -368,6 +373,8 @@ struct CarControl {
     leftLaneVisible @7: Bool;
     rightLaneDepart @8: Bool;
     leftLaneDepart @9: Bool;
+    leadDistance @10: Float32;
+    leadvRel @11: Float32;
 
     enum VisualAlert {
       # these are the choices from the Honda
@@ -420,7 +427,7 @@ struct CarParams {
   enableDsu @5 :Bool;        # driving support unit
   enableBsm @56 :Bool;       # blind spot monitoring
   flags @64 :UInt32;         # flags for car specific quirks
-  experimentalLongitudinalAvailable @71 :Bool;
+  enablehybridEcu @71 :Bool; #hydrid ecu
 
   minEnableSpeed @7 :Float32;
   minSteerSpeed @8 :Float32;
