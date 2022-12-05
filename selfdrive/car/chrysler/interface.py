@@ -26,10 +26,10 @@ class CarInterface(CarInterfaceBase):
     ret.minSteerSpeed = 3.8  # m/s
 
     ret.lateralTuning.pid.kpBP = [0., 10., 35.]
-    ret.lateralTuning.pid.kpV = [0.07, 0.07, 0.07]
+    ret.lateralTuning.pid.kpV = [0.05, 0.055, 0.06]
 
     ret.lateralTuning.pid.kiBP = [0., 15., 30.]
-    ret.lateralTuning.pid.kiV = [0.005, 0.005, 0.003]
+    ret.lateralTuning.pid.kiV = [0.003, 0.005, 0.004]
 
     ret.lateralTuning.pid.kf = 0.00005   # full torque for 10 deg at 80mph means 0.00007818594
 
@@ -48,7 +48,7 @@ class CarInterface(CarInterfaceBase):
       # TODO: allow 2019 cars to steer down to 13 m/s if already engaged.
       ret.minSteerSpeed = 17.5  if not Params().get_bool('ChryslerMangoLat') and not Params().get_bool('LkasFullRangeAvailable') else 0 # m/s 17 on the way up, 13 on the way down once engaged.
     
-	# Chrysler
+    # Chrysler
     if candidate in (CAR.PACIFICA_2017_HYBRID, CAR.PACIFICA_2018, CAR.PACIFICA_2018_HYBRID, CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020):
       ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
       ret.steerRatio = 16.2  # Pacifica Hybrid 2017
