@@ -18,7 +18,7 @@ from selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 # move it at all, this is compensated for too.
 
 LOW_SPEED_X = [0, 10, 20, 30]
-LOW_SPEED_Y = [5, 5, 5, 5]
+LOW_SPEED_Y = [1, 1, 1, 1]
 
 
 class LatControlTorque(LatControl):
