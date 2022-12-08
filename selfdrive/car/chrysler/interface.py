@@ -26,19 +26,19 @@ class CarInterface(CarInterfaceBase):
     ret.minSteerSpeed = 3.8  # m/s
 
     ret.lateralTuning.pid.kpBP = [0., 10., 35.]
-    ret.lateralTuning.pid.kpV = [0.05, 0.055, 0.06]
+    ret.lateralTuning.pid.kpV = [0.03, 0.03, 0.03]
 
     ret.lateralTuning.pid.kiBP = [0., 15., 30.]
-    ret.lateralTuning.pid.kiV = [0.003, 0.005, 0.004]
+    ret.lateralTuning.pid.kiV = [0.003, 0.003, 0.004]
 
-    ret.lateralTuning.pid.kf = 0.00005   # full torque for 10 deg at 80mph means 0.00007818594
+    ret.lateralTuning.pid.kf = 0.00004   # full torque for 10 deg at 80mph means 0.00007818594
 
     ret.experimentalLongitudinalAvailable = Params().get_bool('ChryslerMangoLong')
     ret.openpilotLongitudinalControl = Params().get_bool('ChryslerMangoLong')
 
     # Long tuning Params -  make individual params for cars, baseline Pacifica Hybrid
     ret.longitudinalTuning.kpBP = [0., 6., 10., 35.]
-    ret.longitudinalTuning.kpV = [.7, .6, 0.5, .2]
+    ret.longitudinalTuning.kpV = [.4, .6, 0.5, .2]
     ret.longitudinalTuning.kiBP = [0., 30.]
     ret.longitudinalTuning.kiV = [.001, .001]
     ret.stoppingControl = True
