@@ -52,7 +52,8 @@ class CarInterface(CarInterfaceBase):
     if candidate in (CAR.PACIFICA_2017_HYBRID, CAR.PACIFICA_2018, CAR.PACIFICA_2018_HYBRID, CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020):
       ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
       ret.steerRatio = 16.2  # Pacifica Hybrid 2017
-      ret.mass = 2242. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017      
+      ret.mass = 2242. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017     
+      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
     # Jeep
     elif candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
