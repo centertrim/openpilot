@@ -181,7 +181,7 @@ class CarState(CarStateBase):
       ("ACC_FOLLOW_DEC", "WHEEL_BUTTONS"),
       ("ACC_BUTTON_ON", "WHEEL_BUTTONS"),
       ("REG_CC_BUTTON_ON", "WHEEL_BUTTONS"),
-      (CRUISE_ICON", "DASHBOARD"),
+      ("CRUISE_ICON", "DASHBOARD"),
       ("STANDSTILL", "ESP_8"),
       ("BRAKE_VAL_TOTAL", "ESP_8"),
       ("VEHICLE_SPEED_KPH", "ESP_8"),
