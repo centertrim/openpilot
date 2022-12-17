@@ -113,7 +113,7 @@ def apply_toyota_steer_torque_limits(apply_torque, apply_torque_last, motor_torq
   else:
     LIMITS.STEER_DELTA_UP = 2.2
 
-  LIMITS.STEER_DELTA_DOWN = LIMITS.STEER_DELTA_UP
+  #LIMITS.STEER_DELTA_DOWN = LIMITS.STEER_DELTA_UP
 
   # slow rate if steer torque increases in magnitude
   if apply_torque_last > 0:
