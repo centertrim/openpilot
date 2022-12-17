@@ -101,6 +101,9 @@ class CarInterface(CarInterfaceBase):
     ret.steerFaultPermanent = self.CC.steerErrorMod
     ret.hightorqUnavailable = self.CC.hightorqUnavailable
 
+    if self.CC.follow_dist != 4:
+      ret.experimentalLongitudinalAvailable = 0
+
     # events
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low])
 
