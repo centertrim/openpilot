@@ -240,10 +240,10 @@ struct CarState {
   }
 
 enum FollowSettings {
-    near @1;
-    mid @2;
-    far @3;
-    experimental @4; #this switches to E2E long
+    near @0;
+    mid @1;
+    far @2;
+    experimental @3; #this switches to E2E long
   }
   enum GearShifter {
     unknown @0;
