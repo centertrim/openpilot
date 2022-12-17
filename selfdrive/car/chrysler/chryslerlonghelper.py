@@ -86,30 +86,30 @@ def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, r
     return set_speed, short_press, timer, gas_set, ressetspeed, gas_timer
 
 
-def cruiseiconlogic(acc_enabled, acc_available, has_lead, dist_dec, dist_inc, follow_dist, follow_dist_prev):
+def cruiseiconlogic(acc_enabled, acc_available, has_lead, dist_dec, dist_inc, follow_set, follow_set_prev):
 
-    if follow_dist == follow_dist_prev:
-        follow_dist -= dist_dec
-        follow_dist += dist_inc
-        follow_dist = clip(follow_dist, 1, 4)
+    if follow_set == follow_set_prev:
+        follow_set -= dist_dec
+        follow_set += dist_inc
+        follow_set = clip(follow_set, 1, 4)
     if not (dist_dec or dist_inc):
-        follow_dist_prev = follow_dist
+        follow_set_prev = follow_set
 
     if acc_enabled:
       cruise_state = 4  # ACC engaged
       if has_lead:
-        cruise_icon = follow_dist + 11  # ACC green icon with lead
+        cruise_icon = follow_set + 11  # ACC green icon with lead
       else:
-        cruise_icon = follow_dist + 7  # ACC green icon with no lead
+        cruise_icon = follow_set + 7  # ACC green icon with no lead
     else:
       if acc_available:
         cruise_state = 3 # ACC on
-        cruise_icon = follow_dist + 1 # ACC white icon
+        cruise_icon = follow_set + 1 # ACC white icon
       else:
         cruise_state = 0
         cruise_icon = 0
 
-    return cruise_state, cruise_icon, follow_dist, follow_dist_prev
+    return cruise_state, cruise_icon, follow_set, follow_set_prev
 
 def accel_hysteresis(accel, accel_steady):
 

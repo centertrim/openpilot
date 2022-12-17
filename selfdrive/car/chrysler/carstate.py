@@ -67,6 +67,15 @@ class CarState(CarStateBase):
     ret.cruiseState.speed = max(cp.vl["DASHBOARD"]["ACC_SET_SPEED_MPH"] * CV.MPH_TO_MS, SET_SPEED_MIN)
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]["CRUISE_STATE"] in (1, 2)
+    if cp.vl["DASHBOARD"]["CRUISE_ICON"] in (2, 8, 12):
+      ret.cruiseState.followSettings = 1
+    elif cp.vl["DASHBOARD"]["CRUISE_ICON"] in (3, 9, 13):
+      ret.cruiseState.followSettings = 2
+    elif cp.vl["DASHBOARD"]["CRUISE_ICON"] in (4, 10, 14):
+      ret.cruiseState.followSettings = 3
+    else:
+      ret.cruiseState.followSettings = 4
+
 
     ret.steeringTorque = cp.vl["EPS_2"]["TORQUE_DRIVER"]/4
     ret.steeringTorqueEps = cp.vl["EPS_2"]["TORQUE_MOTOR"]/4 if Params().get_bool("ChryslerMangoLat") else cp.vl["EPS_2"]["TORQUE_MOTOR"]

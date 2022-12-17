@@ -236,8 +236,15 @@ struct CarState {
     speedOffset @3 :Float32;
     standstill @4 :Bool;
     nonAdaptive @5 :Bool;
+    followSettings @7 :followSettings;
   }
 
+enum followSettings {
+    near @1;
+    mid @2;
+    far @3;
+    experimental @4; #this switches to E2E long
+  }
   enum GearShifter {
     unknown @0;
     park @1;

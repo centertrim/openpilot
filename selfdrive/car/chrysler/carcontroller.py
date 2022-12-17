@@ -47,8 +47,8 @@ class CarController:
     self.gas_speed_sync = False
     self.cruise_state = 0
     self.cruise_icon = 0
-    self.follow_dist = 4
-    self.follow_dist_prev = 4
+    self.follow_set = 4
+    self.follow_set_prev = 4
     self.acc_pre_brake = False
     self.accel_lim_prev = 0.
     self.accel_lim = 0.
@@ -220,7 +220,7 @@ class CarController:
                                                                self.set_speed_timer, self.resume_set_speed, self.short_press,
                                                                CS.out.vEgoRaw, self.gas_speed_sync, CS.out.gasPressed, self.gas_timer)
 
-    self.cruise_state, self.cruise_icon, self.follow_dist, self.follow_dist_prev = cruiseiconlogic(self.acc_enabled, self.acc_available, CC.hudControl.leadVisible, CS.acc_followdec_button, CS.acc_followinc_button, self.follow_dist, self.follow_dist_prev)
+    self.cruise_state, self.cruise_icon, self.follow_set, self.follow_set_prev = cruiseiconlogic(self.acc_enabled, self.acc_available, CC.hudControl.leadVisible, CS.acc_followdec_button, CS.acc_followinc_button, self.follow_set, self.follow_set_prev)
 
     # Build ACC long control signals
     ####################################################################################################################
