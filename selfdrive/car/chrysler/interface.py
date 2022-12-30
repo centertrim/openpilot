@@ -42,7 +42,7 @@ class CarInterface(CarInterfaceBase):
     ret.longitudinalTuning.kiBP = [0., 30.]
     ret.longitudinalTuning.kiV = [.001, .001]
     ret.stoppingControl = True
-    ret.stoppingDecelRate = 0.3
+    ret.stoppingDecelRate = 0.2
 
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       # TODO: allow 2019 cars to steer down to 13 m/s if already engaged.
