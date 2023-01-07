@@ -90,8 +90,8 @@ class CarInterface(CarInterfaceBase):
       raise ValueError(f"Unsupported car: {candidate}")
 
     ret.centerToFront = ret.wheelbase * 0.44
-    ret.enableBsm = 720 in fingerprint[0]
-    ret.enablehybridEcu = 655 in fingerprint[0] or 291 in fingerprint[0]
+    ret.enableBsm = True
+    ret.enablehybridEcu = True
 
     return ret
 
