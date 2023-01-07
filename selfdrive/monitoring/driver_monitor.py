@@ -7,8 +7,6 @@ from common.filter_simple import FirstOrderFilter
 from common.stat_live import RunningStatFilter
 from common.transformations.camera import tici_d_frame_size
 
-from common.op_params import opParams
-
 EventName = car.CarEvent.EventName
 
 # ******************************************************************************************
@@ -122,8 +120,6 @@ class DriverBlink():
 
 class DriverStatus():
   def __init__(self, rhd_saved=False, settings=DRIVER_MONITOR_SETTINGS()):
-    self.op_params = opParams()
-
     # init policy settings
     self.settings = settings
 
@@ -298,10 +294,6 @@ class DriverStatus():
       self.hi_stds = 0
 
   def update_events(self, events, driver_engaged, ctrl_active, standstill):
-    if self.op_params.get('not_visible_to_dm_cam'):
-      self._reset_awareness()
-      return
-
     if (driver_engaged and self.awareness > 0 and not self.active_monitoring_mode) or not ctrl_active: # reset only when on disengagement if red reached
       self._reset_awareness()
       return
