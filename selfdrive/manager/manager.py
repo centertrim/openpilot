@@ -88,7 +88,8 @@ def manager_init() -> None:
   params.put_bool("IsReleaseBranch", is_release_branch())
 
   # set dongle id
-  reg_res = register(show_spinner=True)
+  reg_res = UNREGISTERED_DONGLE_ID  # was: register(show_spinner=True)
+  params.put("DongleId", reg_res)   # always Unregistered
   if reg_res:
     dongle_id = reg_res
   else:
