@@ -69,6 +69,24 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       tr("Display speed in km/h instead of mph."),
       "../assets/offroad/icon_metric.png",
     },
+    {
+      "NotVisibleToDM",
+      tr("Driver Not Visible"),
+      tr("Poor lighting etc.  It happens sometimes."),
+      "../assets/offroad/icon_warning.png",
+    },
+    {
+      "ChryslerMangoLong",
+      tr("ChryslerMangoLong"),
+      tr("OP long control.  Requires white panda."),
+      "../assets/offroad/icon_road.png",
+    },
+    {
+      "ChryslerMadGas",
+      tr("ChryslerMadGas"),
+      tr("Max accel/decel during op long.  Turn off for eco gas."),
+      "../assets/offroad/icon_road.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",

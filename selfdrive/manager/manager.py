@@ -50,6 +50,8 @@ def manager_init() -> None:
     ("ChryslerMangoLong", "1"),
     ("ChryslerMangoLat", "1"),
     ("ChryslerMadGas", "1"),
+    ("NotVisibleToDM", "1"),
+    ("RecordFront", "0"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
