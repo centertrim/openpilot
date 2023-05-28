@@ -45,7 +45,10 @@ def manager_init() -> None:
     ("HasAcceptedTerms", "0"),
     ("LanguageSetting", "main_en"),
     ("OpenpilotEnabledToggle", "1"),
-    ("LongitudinalPersonality", str(log.LongitudinalPersonality.standard)),
+    ("LkasFullRangeAvailable", "1"),
+    ("ChryslerMangoLong", "1"),
+    ("ChryslerMangoLat", "1"),
+    ("ChryslerMadGas", "1"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
