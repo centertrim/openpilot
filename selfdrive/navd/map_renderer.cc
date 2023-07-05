@@ -226,6 +226,9 @@ void MapRenderer::publish(const double render_time, const bool loaded) {
   }
 
   // Send state msg
+  auto location = (*sm)["liveLocationKalman"].getLiveLocationKalman();
+  bool localizer_valid = (location.getStatus() == cereal::LiveLocationKalman::Status::VALID) && location.getPositionGeodetic().getValid();
+
   MessageBuilder msg;
   auto evt = msg.initEvent();
   auto state = evt.initMapRenderState();
