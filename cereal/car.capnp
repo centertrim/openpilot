@@ -171,8 +171,6 @@ struct CarState {
   
   engineRpm @46 :Float32;
 
-  engineRpm @46 :Float32;
-
   # brake pedal, 0.0-1.0
   brake @5 :Float32;      # this is user pedal only
   brakePressed @6 :Bool;  # this is user pedal only
@@ -192,8 +190,8 @@ struct CarState {
   stockAeb @30 :Bool;
   stockFcw @31 :Bool;
   espDisabled @32 :Bool;
-  hightorqUnavailable @47 :Bool;
-  accgasOverride @48 :Bool;
+  hightorqUnavailable @48 :Bool;
+  accgasOverride @49 :Bool;
   accFaulted @42 :Bool;
   carFaultedNonCritical @47 :Bool;  # some ECU is faulted, but car remains controllable
 
