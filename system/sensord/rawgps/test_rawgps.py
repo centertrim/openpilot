@@ -80,9 +80,6 @@ class TestRawgpsd(unittest.TestCase):
       loc_status = json.loads(ls)
       assert set(loc_status['modem']['location']['enabled']) <= {'3gpp-lac-ci'}
 
-  def test_assistance_loading(self):
-    # clear assistance data
-    at_cmd("AT+QGPSDEL=0")
 
   def check_assistance(self, should_be_loaded):
     # after QGPSDEL: '+QGPSXTRADATA: 0,"1980/01/05,19:00:00"'

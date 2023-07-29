@@ -64,6 +64,7 @@ class CarInterfaceBase(ABC):
     self.frame = 0
     self.steering_unpressed = 0
     self.low_speed_alert = False
+    self.no_steer_warning = False
     self.silent_steer_warning = True
     self.v_ego_cluster_seen = False
 

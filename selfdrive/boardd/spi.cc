@@ -286,9 +286,6 @@ int PandaSpiHandle::wait_for_ack(uint8_t ack, uint8_t tx, unsigned int timeout, 
       LOGD("SPI: timed out waiting for ACK");
       return SpiError::ACK_TIMEOUT;
     }
-
-    // backoff
-    transfer.delay_usecs = std::clamp(transfer.delay_usecs*2, 10, 250);
   }
 
   return 0;

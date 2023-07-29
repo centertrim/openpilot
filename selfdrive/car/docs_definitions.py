@@ -1,5 +1,6 @@
 import re
 from collections import namedtuple
+import copy
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union
@@ -46,19 +47,12 @@ class BasePart:
 
     return parts
 
-  @property
-  def type(self) -> PartType:
-    raise NotImplementedError
 
 class EnumBase(Enum):
   @property
   def type(self):
     return PartType(self.__class__)
 
-class Connector(Part):
-  @property
-  def type(self) -> PartType:
-    return PartType.connector
 
 class Mount(EnumBase):
   mount = BasePart("mount")
@@ -85,10 +79,6 @@ class BaseCarHarness(BasePart):
   parts: List[Enum] = field(default_factory=lambda: [Accessory.harness_box, Accessory.comma_power_v2, Cable.rj45_cable_7ft])
   has_connector: bool = True  # without are hidden on the harness connector page
 
-  @classmethod
-  def common(cls, add: List[CarPart] = None, remove: List[CarPart] = None):
-    p = [part for part in (add or []) + DEFAULT_CAR_PARTS if part not in (remove or [])]
-    return cls(p)
 
 class CarHarness(EnumBase):
   nidec = BaseCarHarness("Honda Nidec connector")

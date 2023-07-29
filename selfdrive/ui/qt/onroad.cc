@@ -64,20 +64,9 @@ void OnroadWindow::updateState(const UIState &s) {
 
   nvg->updateState(s);
 
-  // update spacing
-  bool navDisabledNow = (*s.sm)["controlsState"].getControlsState().getEnabled() &&
-                        !(*s.sm)["modelV2"].getModelV2().getNavEnabled();
-  if (navDisabled != navDisabledNow) {
-    split->setSpacing(navDisabledNow ? bdr_s * 2 : 0);
-    if (map) {
-      map->setFixedWidth(topWidget(this)->width() / 2 - bdr_s * (navDisabledNow ? 2 : 1));
-    }
-  }
-
-  // repaint border
-  if (bg != bgColor || navDisabled != navDisabledNow) {
+  if (bg != bgColor) {
+    // repaint border
     bg = bgColor;
-    navDisabled = navDisabledNow;
     update();
   }
 }
@@ -121,13 +110,6 @@ void OnroadWindow::offroadTransition(bool offroad) {
 void OnroadWindow::paintEvent(QPaintEvent *event) {
   QPainter p(this);
   p.fillRect(rect(), QColor(bg.red(), bg.green(), bg.blue(), 255));
-
-  if (isMapVisible() && navDisabled) {
-    QRect map_r = uiState()->scene.map_on_left
-                    ? QRect(0, 0, width() / 2, height())
-                    : QRect(width() / 2, 0, width() / 2, height());
-    p.fillRect(map_r, bg_colors[STATUS_DISENGAGED]);
-  }
 }
 
 // ***** onroad widgets *****
