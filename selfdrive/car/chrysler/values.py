@@ -51,8 +51,8 @@ class CarControllerParams:
 
 
 STEER_THRESHOLD = 120
-ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[5, 35], angle_v=[0.3, 0.10])
-ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[5, 35], angle_v=[0.36, 0.20])
+ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[5, 35], angle_v=[0.2, 0.10])
+ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[5, 35], angle_v=[0.26, 0.20])
 RAM_DT = {CAR.RAM_1500, }
 RAM_HD = {CAR.RAM_HD, }
 RAM_CARS = RAM_DT | RAM_HD
