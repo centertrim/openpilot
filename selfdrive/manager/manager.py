@@ -52,6 +52,7 @@ def manager_init() -> None:
     ("ChryslerMadGas", "1"),
     ("NotVisibleToDM", "1"),
     ("RecordFront", "0"),
+    ("ExperimentalModeConfirmed", "1"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
