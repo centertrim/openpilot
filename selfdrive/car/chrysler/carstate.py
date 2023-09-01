@@ -68,22 +68,25 @@ class CarState(CarStateBase):
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]["CRUISE_STATE"] in (1, 2)
 
-
+    # Distances 1 & 2 are standard chrysler cruise, distance 3 is Chill Op Long, distance 4 is E2E Op long
     self.desiredExperimentalToggleStatus = False
+    self.desiredExperimentalLongEnabled = False
     if cp.vl["DASHBOARD"]["CRUISE_ICON"] in (2, 8, 12):
       ret.cruiseState.followSettings = 1
     elif cp.vl["DASHBOARD"]["CRUISE_ICON"] in (3, 9, 13):
       ret.cruiseState.followSettings = 2
     elif cp.vl["DASHBOARD"]["CRUISE_ICON"] in (4, 10, 14):
       ret.cruiseState.followSettings = 3
+      self.desiredExperimentalLongEnabled = True
     else:
       ret.cruiseState.followSettings = 4
       self.desiredExperimentalToggleStatus = True
+      self.desiredExperimentalLongEnabled = True
 
     if self.desiredExperimentalToggleStatus != Params().get_bool('ExperimentalMode'):
       Params().put_bool("ExperimentalMode", self.desiredExperimentalToggleStatus)
-    if self.desiredExperimentalToggleStatus != Params().get_bool('ExperimentalLongitudinalEnabled'):
-      Params().put_bool("ExperimentalLongitudinalEnabled", self.desiredExperimentalToggleStatus)
+    if self.desiredExperimentalLongEnabled != Params().get_bool('ExperimentalLongitudinalEnabled'):
+      Params().put_bool("ExperimentalLongitudinalEnabled", self.desiredExperimentalLongEnabled)
 
     ret.steeringTorque = cp.vl["EPS_2"]["TORQUE_DRIVER"]/4
     ret.steeringTorqueEps = cp.vl["EPS_2"]["TORQUE_MOTOR"]/4 if Params().get_bool("ChryslerMangoLat") else cp.vl["EPS_2"]["TORQUE_MOTOR"]
